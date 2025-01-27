@@ -1,7 +1,7 @@
 Package: cdid
 Type: Package
 Title: The Chained Difference-in-Differences
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: 
     c(
       person("David", "Benatia", email = "david.benatia@hec.ca", role = c("cre", "aut")),
@@ -21,10 +21,10 @@ VignetteBuilder: knitr
 Suggests: rmarkdown, knitr, openxlsx, data.table, jsonlite, stargazer,
         devtools,
 NeedsCompilation: no
-Packaged: 2025-01-07 18:07:00 UTC; dvbn
+Packaged: 2025-01-27 21:14:12 UTC; dvbn
 Author: David Benatia [cre, aut],
   Christophe Bellégo [aut],
   Joel Cuerrier [aut],
   Vincent Dortet-Bernadet [aut]
 Repository: CRAN
-Date/Publication: 2025-01-08 15:10:12 UTC
+Date/Publication: 2025-01-27 21:40:02 UTC

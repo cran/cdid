@@ -1,8 +1,8 @@
-357a8b0dcd2af8d497e589d8400c9f44 *DESCRIPTION
+b1ae28bef02b1878d8dccd720c08f087 *DESCRIPTION
 415596263e247e1df09835915584f604 *NAMESPACE
 29fdc826db3decf0d5214b96daa97eca *R/DIDparams.R
-937d81ba1f58e3567149a6a38da2fe4c *R/GMM_compute_delta_att.R
-c33ff67a05657048e18d9c7d0bd1af54 *R/GMM_convert_delta_to_att.R
+ec75ccddf2ae10540649397faaad336b *R/GMM_compute_delta_att.R
+f0da06bd67feddb294980295d217fee4 *R/GMM_convert_delta_to_att.R
 3fd646182e662d744d99f01335b17e08 *R/GMM_convert_result.R
 e8fe2db613bc3bd852abef8016f4a410 *R/MP.R
 1206b91fa7420d20c89340be02e20790 *R/att_gt_cdid.R
@@ -11,11 +11,11 @@ f6e7bbfebe7fbba3eaaa78e88b184f8c *R/gg.R
 2bb9d2f5f8561bd5a0203ae2197c877a *R/pre_process_cdid.R
 a70ad7a5e614a6391131f49da2cc0e29 *R/process_attgt_gmm.R
 a93054853d0d821703186bcce5e31f48 *README.md
-36d598274ec2b0ad05ea4121c07e3aa6 *build/vignette.rds
+6ce61fc8b6ebc561f213f9d4a31e87a3 *build/vignette.rds
 40ed78378c9591f0b533a41efe62aaf0 *inst/CITATION
 55d26bbf86077c7bb2f6f9c8e808051a *inst/doc/vignettes.R
 7dcfbda0f2914e9b59282df6be8205d8 *inst/doc/vignettes.Rmd
-146e28fc3de025db80b0876df871c3d2 *inst/doc/vignettes.html
+e12417a260d96e251430439b48adcef4 *inst/doc/vignettes.html
 72cfcb6bd8e46f7349eaf84c15e5ff8c *man/DIDparams.Rd
 bc430021be034aaccc601c8d1435d112 *man/MP.Rd
 58479da4ecf87da4f2345725b4b79cd4 *man/att_gt_cdid.Rd
