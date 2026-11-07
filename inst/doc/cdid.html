@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting Started with cdid</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting Started with cdid</h1>
+
+
+
+<p><code>cdid</code> estimates group-time average treatment effects
+(<code>att_gt()</code>) and their aggregations (<code>aggte()</code>) in
+panel data with missing outcomes using the chained
+difference-in-differences of Bellégo, Benatia and Dortet-Bernadet (2025)
+(<a href="https://doi.org/10.1016/j.jeconom.2024.105783" class="uri">https://doi.org/10.1016/j.jeconom.2024.105783</a>). It
+builds on the <code>did</code> interface of Callaway and Sant’Anna
+(2021) and uses chained estimation by default for panel data
+(<code>mode = &quot;chained&quot;</code>), while <code>mode = &quot;ordinary&quot;</code>
+delegates unchanged to <code>did</code>.</p>
+<div id="synthetic-incomplete-panel-and-unit-table" class="section level2">
+<h2>1. Synthetic incomplete panel and unit table</h2>
+<p>We simulate a self-contained long panel in base R with <span class="math inline">\(N = 900\)</span> units across <span class="math inline">\(T = 5\)</span> periods (<code>1</code> to
+<code>5</code>), a binary covariate <code>x</code>, a never-treated
+control group (<code>g = 0</code>), and a cohort first treated in period
+<code>3</code> (<code>g = 3</code>). Treatment cohort membership depends
+on <code>x</code> through a binary logit, and the latent outcome
+combines a unit fixed effect <span class="math inline">\(\alpha_i\)</span>, a common trend plus an
+<code>x</code>-specific trend, independent normal noise, and a
+homogeneous post-treatment effect <span class="math inline">\(1 + 0.25(t
+- 3)\)</span> for <span class="math inline">\(g = 3\)</span> at <span class="math inline">\(t \ge 3\)</span> (population target values
+<code>0</code> at pre-treatment period <code>2</code>, and
+<code>1.00</code>, <code>1.25</code>, <code>1.50</code> at periods
+<code>3</code>, <code>4</code>, <code>5</code>, with post-treatment
+average <code>1.25</code>).</p>
+<p>Each unit is randomly assigned, independently of <code>(g, x)</code>
+and outcome shocks, to one of four consecutive observation windows
+<code>{1, 2}</code>, <code>{2, 3}</code>, <code>{3, 4}</code>, or
+<code>{4, 5}</code>. Every unit therefore has two observed outcomes and
+three <code>NA</code> outcomes, and no unit is observed at all five
+dates. We retain all long panel rows (with <code>y = NA</code> outside
+the unit’s window) and pass the full unit table <code>units</code> as
+<code>frame</code>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(cdid)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">20261029</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>n_units <span class="ot">&lt;-</span> <span class="dv">900</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>n_periods <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>units <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">id =</span> <span class="fu">seq_len</span>(n_units),</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rbinom</span>(n_units, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">prob =</span> <span class="fl">0.5</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>)</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>units<span class="sc">$</span>g <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>  <span class="fu">runif</span>(n_units) <span class="sc">&lt;</span> <span class="fu">plogis</span>(<span class="sc">-</span><span class="fl">0.2</span> <span class="sc">+</span> <span class="fl">0.4</span> <span class="sc">*</span> units<span class="sc">$</span>x),</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>  <span class="dv">3</span>,</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>  <span class="dv">0</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>)</span>
+<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>unit_alpha <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n_units)</span>
+<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>window_start <span class="ot">&lt;-</span> <span class="fu">sample.int</span>(n_periods <span class="sc">-</span> <span class="dv">1</span><span class="dt">L</span>, <span class="at">size =</span> n_units, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a>panel_data <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>  <span class="at">id =</span> <span class="fu">rep</span>(units<span class="sc">$</span>id, <span class="at">each =</span> n_periods),</span>
+<span id="cb1-21"><a href="#cb1-21" tabindex="-1"></a>  <span class="at">time =</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(n_periods), <span class="at">times =</span> n_units),</span>
+<span id="cb1-22"><a href="#cb1-22" tabindex="-1"></a>  <span class="at">g =</span> <span class="fu">rep</span>(units<span class="sc">$</span>g, <span class="at">each =</span> n_periods),</span>
+<span id="cb1-23"><a href="#cb1-23" tabindex="-1"></a>  <span class="at">x =</span> <span class="fu">rep</span>(units<span class="sc">$</span>x, <span class="at">each =</span> n_periods)</span>
+<span id="cb1-24"><a href="#cb1-24" tabindex="-1"></a>)</span>
+<span id="cb1-25"><a href="#cb1-25" tabindex="-1"></a></span>
+<span id="cb1-26"><a href="#cb1-26" tabindex="-1"></a>treated_post <span class="ot">&lt;-</span> panel_data<span class="sc">$</span>g <span class="sc">==</span> <span class="dv">3</span> <span class="sc">&amp;</span> panel_data<span class="sc">$</span>time <span class="sc">&gt;=</span> <span class="dv">3</span></span>
+<span id="cb1-27"><a href="#cb1-27" tabindex="-1"></a>true_effect <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(treated_post, <span class="dv">1</span> <span class="sc">+</span> <span class="fl">0.25</span> <span class="sc">*</span> (panel_data<span class="sc">$</span>time <span class="sc">-</span> <span class="dv">3</span>), <span class="dv">0</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" tabindex="-1"></a>y_latent <span class="ot">&lt;-</span> <span class="fu">rep</span>(unit_alpha, <span class="at">each =</span> n_periods) <span class="sc">+</span></span>
+<span id="cb1-29"><a href="#cb1-29" tabindex="-1"></a>  (<span class="fl">0.4</span> <span class="sc">+</span> <span class="fl">0.2</span> <span class="sc">*</span> panel_data<span class="sc">$</span>x) <span class="sc">*</span> panel_data<span class="sc">$</span>time <span class="sc">+</span></span>
+<span id="cb1-30"><a href="#cb1-30" tabindex="-1"></a>  true_effect <span class="sc">+</span></span>
+<span id="cb1-31"><a href="#cb1-31" tabindex="-1"></a>  <span class="fu">rnorm</span>(<span class="fu">nrow</span>(panel_data), <span class="at">sd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb1-32"><a href="#cb1-32" tabindex="-1"></a></span>
+<span id="cb1-33"><a href="#cb1-33" tabindex="-1"></a>in_window <span class="ot">&lt;-</span> panel_data<span class="sc">$</span>time <span class="sc">==</span> <span class="fu">rep</span>(window_start, <span class="at">each =</span> n_periods) <span class="sc">|</span></span>
+<span id="cb1-34"><a href="#cb1-34" tabindex="-1"></a>  panel_data<span class="sc">$</span>time <span class="sc">==</span> <span class="fu">rep</span>(window_start <span class="sc">+</span> <span class="dv">1</span><span class="dt">L</span>, <span class="at">each =</span> n_periods)</span>
+<span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a>panel_data<span class="sc">$</span>y <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(in_window, y_latent, <span class="cn">NA_real_</span>)</span></code></pre></div>
+<p>We verify that <code>(id, time)</code> pairs are unique and count
+observed outcomes per unit across the unit table <code>units</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="sc">!</span><span class="fu">anyDuplicated</span>(panel_data[<span class="fu">c</span>(<span class="st">&quot;id&quot;</span>, <span class="st">&quot;time&quot;</span>)]))</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>obs_per_unit <span class="ot">&lt;-</span> <span class="fu">tabulate</span>(</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="fu">match</span>(panel_data<span class="sc">$</span>id[<span class="sc">!</span><span class="fu">is.na</span>(panel_data<span class="sc">$</span>y)], units<span class="sc">$</span>id),</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>  <span class="at">nbins =</span> <span class="fu">nrow</span>(units)</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="fu">table</span>(<span class="at">cohort =</span> units<span class="sc">$</span>g, <span class="at">observed_dates =</span> obs_per_unit)</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;       observed_dates</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt; cohort   2</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;      0 461</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;      3 439</span></span></code></pre></div>
+</div>
+<div id="data-requirements-and-identification-conditions" class="section level2">
+<h2>2. Data requirements and identification conditions</h2>
+<p>In chained mode, <code>data</code> must have unique
+<code>(idname, tname)</code> rows, finite numeric calendar dates
+<code>tname</code>, numeric outcomes <code>yname</code> that are finite
+when observed and kept as <code>NA</code> when missing (never replaced
+by <code>0</code>), and a constant known treatment cohort
+<code>gname</code> per unit (<code>0</code> for never treated). No unit
+is required to have a complete history or an observed outcome at the
+cohort baseline date (<span class="math inline">\(t = 2\)</span>). The
+unit table <code>frame</code> defines the study population <span class="math inline">\(F\)</span> of size <span class="math inline">\(N =
+|F|\)</span>: units observed at two or more dates (<span class="math inline">\(A\)</span>) supply within-unit changes <span class="math inline">\(\Delta Y_{s,t} = Y_t - Y_s\)</span>, while
+singletons (one observed outcome) and units with no observed outcomes
+supply no differences but remain in <span class="math inline">\(F\)</span> for population counts, cohort shares,
+active selection or imputation models, and influence functions for all
+study units.</p>
+<p>With the default <code>selection = &quot;none&quot;</code>, no
+observation-probability or imputation model is fitted. Instead, for each
+cohort and each date pair <span class="math inline">\((s, t)\)</span>
+used by the estimator, the subset of units observed at both <span class="math inline">\(s\)</span> and <span class="math inline">\(t\)</span> is assumed representative of its cohort
+in the study population with respect to the mean outcome change: <span class="math display">\[E[Y_t - Y_s \mid G = g, S_{s,t} = 1] = E[Y_t -
+Y_s \mid G = g].\]</span> This is a population expectation condition in
+the study population; it does not require individual units to have
+identical outcome changes, realized sample means to agree across
+observation windows, or arbitrary missingness patterns to identify every
+target. Observation may depend on the time-invariant unit fixed effect
+<span class="math inline">\(\alpha_i\)</span> removed by within-unit
+differencing, provided it does not select on the mean change.</p>
+<p>Identification and inference also require: no treatment anticipation
+before <span class="math inline">\(g\)</span>
+(<code>anticipation = 0</code>, so <span class="math inline">\(t =
+2\)</span> is cohort 3’s reference date); conditional parallel trends
+from the reference period (<code>pt_assumption = &quot;post&quot;</code>); overlap
+in the active comparison risk sets; for doubly robust estimation
+(<code>est_method = &quot;dr&quot;</code>), either a correctly specified treatment
+propensity logit or a correctly specified control outcome-change
+regression given <code>xformla</code>; and catalog support connecting
+each target date to the reference date with eligible controls.</p>
+<p>In this design, the untreated conditional mean change from <span class="math inline">\(s\)</span> to <span class="math inline">\(t\)</span> is <span class="math inline">\((t -
+s)(0.4 + 0.2x)\)</span> in both cohorts, so conditional parallel trends
+and the control regressions hold under either outcome-pooling choice. By
+default, <code>outcome_pooling = &quot;separate&quot;</code> lets each comparison
+have its own outcome-regression slopes. Set
+<code>outcome_pooling = &quot;pooled&quot;</code> to share slopes per calendar
+step when that restriction is credible. The treatment logit is also
+correctly specified by <code>~ x</code>, and the independently assigned
+observation windows preserve the cohort mean changes in population.</p>
+</div>
+<div id="estimating-and-inspecting-group-time-effects" class="section level2">
+<h2>3. Estimating and inspecting group-time effects</h2>
+<p>We fit chained doubly robust estimation with
+<code>xformla = ~ x</code> and <code>selection = &quot;none&quot;</code>,
+combining the overlapping adjacent-period comparisons by feasible
+two-step GMM (<code>gmm_weighting = &quot;optimal&quot;</code>). Here we set
+<code>bstrap = FALSE</code> and <code>cband = FALSE</code> to compute
+fast analytical standard errors and pointwise normal confidence
+intervals; by default (<code>bstrap = TRUE, cband = TRUE</code>),
+<code>cdid</code> computes multiplier-bootstrap standard errors and
+simultaneous confidence bands.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit <span class="ot">&lt;-</span> cdid<span class="sc">::</span><span class="fu">att_gt</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="at">yname =</span> <span class="st">&quot;y&quot;</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="at">tname =</span> <span class="st">&quot;time&quot;</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">idname =</span> <span class="st">&quot;id&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">gname =</span> <span class="st">&quot;g&quot;</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">xformla =</span> <span class="sc">~</span> x,</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="at">data =</span> panel_data,</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="at">frame =</span> units,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">control_group =</span> <span class="st">&quot;nevertreated&quot;</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">est_method =</span> <span class="st">&quot;dr&quot;</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;chained&quot;</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">selection =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>  <span class="at">pt_assumption =</span> <span class="st">&quot;post&quot;</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  <span class="at">bstrap =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>  <span class="at">cband =</span> <span class="cn">FALSE</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>)</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="fu">summary</span>(fit)</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="co">#&gt; cdid chained difference-in-differences (chained doubly robust GMM): cdid_MP</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="co">#&gt;   cdid 1.2.0.1 result built on did 2.5.1 (tested: did 2.5.1); did&#39;s MP methods tabulate the estimates below.</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="co">#&gt;   Chained estimators: Bellego C., Benatia D. and V. Dortet-Bernadet (2025). &quot;The Chained Difference-in-Differences.&quot; Journal of Econometrics 248, 105783. doi:10.1016/j.jeconom.2024.105783.</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="co">#&gt;   Ordinary estimators: Callaway B. and P. H. C. Sant&#39;Anna (2021). &quot;Difference-in-Differences with Multiple Time Periods.&quot; Journal of Econometrics 225(2), 200-230. doi:10.1016/j.jeconom.2020.12.001.</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a><span class="co">#&gt; cdid::att_gt(yname = &quot;y&quot;, tname = &quot;time&quot;, idname = &quot;id&quot;, gname = &quot;g&quot;, </span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="co">#&gt;     xformla = ~x, data = panel_data, frame = units, control_group = &quot;nevertreated&quot;, </span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt;     est_method = &quot;dr&quot;, mode = &quot;chained&quot;, selection = &quot;none&quot;, </span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt;     pt_assumption = &quot;post&quot;, bstrap = FALSE, cband = FALSE)</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; Group-Time Average Treatment Effects:</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt;  Group Time ATT(g,t) Std. Error [95% Pointwise  Conf. Band]  </span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt;      3    2   0.0496     0.0917         -0.1302      0.2293  </span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt;      3    3   0.7934     0.0932          0.6107      0.9761 *</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt;      3    4   1.2238     0.1356          0.9579      1.4896 *</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt;      3    5   1.4039     0.1659          1.0788      1.7290 *</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; Signif. codes: `*&#39; confidence band does not cover 0</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; P-value for pre-test of parallel trends assumption:  0.588958075147391</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; Control Group:  Never Treated,  Anticipation Periods:  0</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; Estimation Method:  Doubly Robust</span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; Chained support: 4 of 4 requested cells available.</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt;   Units: 900 in the unit table, 0 observed at all 5 dates, 900 with at least two observed outcomes.</span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt;   Observation correction: none (selection = &quot;none&quot;).</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt;   Parallel trends: PT-post; base_period = &quot;varying&quot;.</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt;   GMM weighting: optimal (two-step); covariance regularization: not applied (moment covariance well conditioned).</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt;   Inference: analytic standard errors, unit-level; pointwise intervals.</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt;   Parallel-trends pre-test: W = 0.291974, df = 1, p = 0.589 (Wald test of the pretrend cell).</span></span></code></pre></div>
+<p>Compare the estimates with the population targets: <code>0</code> for
+the pre-treatment comparison reported at period <code>2</code>, and
+<code>1.00</code>, <code>1.25</code>, <code>1.50</code> at periods
+<code>3</code>, <code>4</code>, <code>5</code>. Realized estimates vary
+across samples; one draw does not establish bias, coverage, or relative
+efficiency. <code>tidy()</code> exposes cell-level estimates,
+availability and support reasons; <code>glance()</code> gives a one-row
+fit summary:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>cells <span class="ot">&lt;-</span> cdid<span class="sc">::</span><span class="fu">tidy</span>(fit)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>cells[, <span class="fu">c</span>(<span class="st">&quot;target.id&quot;</span>, <span class="st">&quot;role&quot;</span>, <span class="st">&quot;estimate&quot;</span>, <span class="st">&quot;std.error&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>          <span class="st">&quot;conf.low&quot;</span>, <span class="st">&quot;conf.high&quot;</span>, <span class="st">&quot;available&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>          <span class="st">&quot;support.status&quot;</span>, <span class="st">&quot;support.reason&quot;</span>)]</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt;      target.id role   estimate  std.error   conf.low conf.high available</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; 1 pre(g=3,t=2)  pre 0.04955105 0.09170237 -0.1301823 0.2292844      TRUE</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; 2 ATT(g=3,t=3) post 0.79343581 0.09322092  0.6107262 0.9761455      TRUE</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; 3 ATT(g=3,t=4) post 1.22375601 0.13563479  0.9579167 1.4895953      TRUE</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; 4 ATT(g=3,t=5) post 1.40388077 0.16587612  1.0787695 1.7289920      TRUE</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;              support.status</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; 1 supported_direct_pretrend</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; 2                 estimable</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; 3                 estimable</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; 4                 estimable</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;                                                                         support.reason</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; 1                                 direct auxiliary comparison 1-&gt;2 with controls {Inf}</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; 2 level anchored to the cohort reference through retained comparison rows (prop:graph)</span></span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; 3 level anchored to the cohort reference through retained comparison rows (prop:graph)</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; 4 level anchored to the cohort reference through retained comparison rows (prop:graph)</span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a>cdid<span class="sc">::</span><span class="fu">glance</span>(fit)</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;   nobs ngroup ntime control.group est.method                 estimator</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt; 1  900      1     5  nevertreated         dr chained doubly robust GMM</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;   n.requested n.available                         band.family inference</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt; 1           4           4 pointwise_normal_over_supported_ids  analytic</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;   clustered</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt; 1     FALSE</span></span></code></pre></div>
+</div>
+<div id="aggregating-effects-and-event-study-plotting" class="section level2">
+<h2>4. Aggregating effects and event-study plotting</h2>
+<p><code>cdid::aggte()</code> aggregates the retained
+<code>cdid_MP</code> result without refitting and inherits its inference
+settings unless overridden. We compute the overall post-treatment
+average (<code>type = &quot;simple&quot;</code>) and event-time estimates
+(<code>type = &quot;dynamic&quot;</code>), inspect the tidy dynamic table, and
+plot the event study with <code>cdid::ggdid()</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>agg_simple <span class="ot">&lt;-</span> cdid<span class="sc">::</span><span class="fu">aggte</span>(fit, <span class="at">type =</span> <span class="st">&quot;simple&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>agg_dynamic <span class="ot">&lt;-</span> cdid<span class="sc">::</span><span class="fu">aggte</span>(fit, <span class="at">type =</span> <span class="st">&quot;dynamic&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="fu">summary</span>(agg_simple)</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; cdid chained difference-in-differences (chained doubly robust GMM): cdid_AGGTEobj</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co">#&gt;   cdid 1.2.0.1 result built on did 2.5.1 (tested: did 2.5.1); did&#39;s AGGTEobj methods tabulate the estimates below.</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;   Chained estimators: Bellego C., Benatia D. and V. Dortet-Bernadet (2025). &quot;The Chained Difference-in-Differences.&quot; Journal of Econometrics 248, 105783. doi:10.1016/j.jeconom.2024.105783.</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt;   Ordinary estimators: Callaway B. and P. H. C. Sant&#39;Anna (2021). &quot;Difference-in-Differences with Multiple Time Periods.&quot; Journal of Econometrics 225(2), 200-230. doi:10.1016/j.jeconom.2020.12.001.</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; Call:</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="co">#&gt; cdid::aggte(fit, type = &quot;simple&quot;)</span></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt;     ATT    Std. Error     [ 95%  Conf. Int.]  </span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt;  1.1404        0.1184     0.9083      1.3724 *</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt; ---</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; Signif. codes: `*&#39; confidence band does not cover 0</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; Control Group:  Never Treated,  Anticipation Periods:  0</span></span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt; Estimation Method:  Doubly Robust</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; Chained simple aggregation: 1 of 1 intended aggregate(s) available; na.rm = FALSE.</span></span>
+<span id="cb5-25"><a href="#cb5-25" tabindex="-1"></a><span class="co">#&gt;   Parallel trends: PT-post; base_period = &quot;varying&quot;.</span></span>
+<span id="cb5-26"><a href="#cb5-26" tabindex="-1"></a><span class="co">#&gt;   Inference: analytic standard errors, unit-level; pointwise intervals.</span></span>
+<span id="cb5-27"><a href="#cb5-27" tabindex="-1"></a>cdid<span class="sc">::</span><span class="fu">tidy</span>(agg_dynamic)[, <span class="fu">c</span>(<span class="st">&quot;label&quot;</span>, <span class="st">&quot;estimate&quot;</span>,</span>
+<span id="cb5-28"><a href="#cb5-28" tabindex="-1"></a>                            <span class="st">&quot;std.error&quot;</span>, <span class="st">&quot;conf.low&quot;</span>, <span class="st">&quot;conf.high&quot;</span>,</span>
+<span id="cb5-29"><a href="#cb5-29" tabindex="-1"></a>                            <span class="st">&quot;available&quot;</span>, <span class="st">&quot;reason&quot;</span>)]</span>
+<span id="cb5-30"><a href="#cb5-30" tabindex="-1"></a><span class="co">#&gt;      label   estimate  std.error   conf.low conf.high available          reason</span></span>
+<span id="cb5-31"><a href="#cb5-31" tabindex="-1"></a><span class="co">#&gt; 1 event_-1 0.04955105 0.09170237 -0.1301823 0.2292844      TRUE intended_target</span></span>
+<span id="cb5-32"><a href="#cb5-32" tabindex="-1"></a><span class="co">#&gt; 2  event_0 0.79343581 0.09322092  0.6107262 0.9761455      TRUE intended_target</span></span>
+<span id="cb5-33"><a href="#cb5-33" tabindex="-1"></a><span class="co">#&gt; 3  event_1 1.22375601 0.13563479  0.9579167 1.4895953      TRUE intended_target</span></span>
+<span id="cb5-34"><a href="#cb5-34" tabindex="-1"></a><span class="co">#&gt; 4  event_2 1.40388077 0.16587612  1.0787695 1.7289920      TRUE intended_target</span></span>
+<span id="cb5-35"><a href="#cb5-35" tabindex="-1"></a>cdid<span class="sc">::</span><span class="fu">ggdid</span>(agg_dynamic)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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y70DAECf62AFptMalKF+LekmUPrL9dpmtjXtOt978803Z2VlEVFNTU1FRcXWrVtbm73rrrtWrFjh2tFdd9114MCB1k1vb++8vDzXChs2bHjmmWdcS1avXn3NNde4lgwdOtRmO38XYnp6+tq1a10rLF++/H//+59rSUZGRkhISOtmTk7ODTfc4FphyZIljz76qGvJnDlzTp8+3RjkAyMAABk2SURBVLo5YMCAnTt3ulb4/PPPX3/9ddeSb775ZuzYsa2bWq02LS3NtcJNN9301ltvuZY8/PDD27Ztcy05c+YM47K+3LFjx4MPPuha4c0337z55ptdS9LS0rRabevm6NGjv/vuO7eHfPrpp64l27dvj4uLc+109uzZbgN77rnnXEtuvPHG7Ozs1s2goKDDhw+7Vvjmm2+WLVvmWvL5559PmzatddPhcAwZMsS1wty5c//5z3+6lixZsmT9+vWuJbm5uT4+59+yZGRk3HHHHa4Vli9ffvfdd7uWpKenq1Sq1s2hQ4du2rTJtcKHH364atUq15KNGzcOGzasdbOmpmby5MmuFe68886XXnrJtcTtYJbJZPn5+W5tPv300279zps3z7XE7WCeOnXqf/7zH9cKf//737/++mvXEreDOTc39/rrr3et0P5gnjt37qlTp1o3Y2Jidu3a5Vph7dq1r732mmuJ28Hc3NycmprqWuHGG298++23XUseeeQR1x9/Ijp9+rRAcP5Nc1cO5tGjR2s0mtbNtLS077//3rXCW2+99cknn7iWuB3MxcXFs2bNcq3Q/mC+6aabjh8/3rrZ/mD+9ttv//a3v7mWfPbZZ9OnT2/ddDqdgwcPdq0wZ86cjz76yLWk/cGck5Pj6+vbunno0KHbb7/dtcKyZcvuuece15ILHsyrV6/+4IMPXEs2bNgwfPjw1s3a2tpJkya5Vmh/MC9evHj//v2tm+0P5l9//fWpp55yLVm1atX8+fNdS5KSkqzW87dITJkyZd26da4VVqxY8d///te15ODBg6Ghoa2brQfzjBkz3F7lFp4DjEReQpvVxhEREWe1WoVKUVf3jhkzJiAggIh++umn0NBQ1x97t7MVEaWmpspkstZNicT9QmR4ePjMmTNdS1yfXourrrrK4XC0brq+VC0SExPdGnHrSKlUulWIjY11a2TChAkDBgxo3XQ9ZbSIiYlxa8Tf3991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" /><!-- --></p>
+</div>
+<div id="advanced-options-and-further-documentation" class="section level2">
+<h2>5. Advanced options and further documentation</h2>
+<p>Beyond the baseline specification above, <code>cdid</code>
+supports:</p>
+<ul>
+<li><strong>Treatment adjustment (<code>est_method</code>):</strong>
+<code>&quot;dr&quot;</code> (default), <code>&quot;reg&quot;</code> (separate control
+outcome-change regressions by default, with
+<code>outcome_pooling = &quot;pooled&quot;</code> available), <code>&quot;ipw&quot;</code>,
+or custom <code>did</code>-style IPW callbacks.</li>
+<li><strong>Covariate-dependent missingness
+(<code>selection = &quot;conditional_mtar&quot;</code>):</strong> observation
+weighting (<code>selection_est_method = &quot;ipw&quot;</code> with
+<code>selection_model = &quot;pair_logit&quot;</code> or
+<code>&quot;independent_period_logit&quot;</code>), actual-change imputation
+(<code>selection_est_method = &quot;imputation&quot;</code>), or their augmented
+combination (<code>selection_est_method = &quot;dr&quot;</code> with treatment
+IPW, OR or DR), with configurable slope pooling
+(<code>selection_pooling</code>, <code>imputation_pooling</code>),
+separate selection formulas (<code>selection_xformla</code>), and subset
+fitting universes (<code>selection_universe</code>).</li>
+<li><strong>Parallel trends, weights, clustering, and pretests:</strong>
+additional untreated-trend restrictions from an explicit common start
+date (<code>pt_assumption = &quot;all&quot;</code> with <code>pt_start</code>),
+reference-date covariates and <code>fix_weights</code>, clustered
+inference (<code>clustervars</code>), and the chained conditional
+pretrend test (<code>cdid::conditional_did_pretest()</code>).</li>
+</ul>
+<p>See the installed help pages (<code>?cdid::att_gt</code>,
+<code>?cdid::aggte</code>, <code>?cdid::conditional_did_pretest</code>,
+<code>?cdid::reexports</code>) and the repository documentation at <a href="https://github.com/dvbn/cdid" class="uri">https://github.com/dvbn/cdid</a>, especially
+<code>docs/help/prepare-data.md</code>,
+<code>docs/help/investigate-missingness.md</code>,
+<code>docs/methods/missing-outcomes.md</code>, and the companion
+notebook.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

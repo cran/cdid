@@ -1,7 +1,7 @@
 Package: cdid
 Type: Package
 Title: The Chained Difference-in-Differences
-Version: 0.1.1
+Version: 1.2.0.1
 Authors@R: 
     c(
       person("David", "Benatia", email = "david.benatia@hec.ca", role = c("cre", "aut")),
@@ -9,22 +9,38 @@ Authors@R:
       person("Joel", "Cuerrier", email = "cuerrier.j.clg@gmail.com", role = c("aut")),
       person("Vincent", "Dortet-Bernadet", email = "vincent.dortet-bernadet@finances.gouv.fr", role = "aut")
     )
-URL: https://github.com/joelcuerrier/cdid
 Maintainer: David Benatia <david.benatia@hec.ca>
-Description: Extends the 'did' package to improve efficiency and handling of unbalanced panel data. Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences", Journal of Econometrics, <doi:10.1016/j.jeconom.2024.105783>.
-License: GPL-2
-Encoding: UTF-8
-Imports: Matrix, purrr, MASS, did, BMisc, methods, stats, utils
-RoxygenNote: 7.3.2
-BugReports: https://github.com/joelcuerrier/cdid/issues
+Description: Estimates group-time average treatment effects in panels with
+    missing outcomes by the chained difference-in-differences of Bellégo,
+    Benatia and Dortet-Bernadet (2025) <doi:10.1016/j.jeconom.2024.105783>.
+    It is a layer on the 'did' package that keeps the att_gt() and aggte()
+    interface and adds an estimation mode. Chained estimation, the default for
+    panel data, combines short within-unit comparisons by the generalized
+    method of moments. It provides chained inverse probability weighting
+    (IPW), outcome regression (OR) and doubly robust (DR) estimation, where OR
+    and DR use separate or pooled regressions of the controls' outcome changes; custom
+    IPW callbacks; correction for covariate-dependent missing outcomes by
+    observation weighting, change imputation or their augmented combination;
+    parallel trends from each cohort's reference period (PT-post) or from a
+    chosen common start date (PT-all); and a chained conditional pretrend test
+    through conditional_did_pretest(). Ordinary mode delegates unchanged to
+    the Callaway and Sant'Anna (2021) <doi:10.1016/j.jeconom.2020.12.001>
+    estimators in 'did'.
+License: GPL-3
+URL: https://github.com/dvbn/cdid
+BugReports: https://github.com/dvbn/cdid/issues
+Depends: R (>= 4.1.0)
+Imports: did (>= 2.5.1), DRDID (>= 1.4.0), parallel
+Suggests: testthat (>= 3.0.0), digest, ggplot2, knitr, rmarkdown,
+        generics, jsonlite, waldo, withr
 VignetteBuilder: knitr
-Suggests: rmarkdown, knitr, openxlsx, data.table, jsonlite, stargazer,
-        devtools,
-NeedsCompilation: no
-Packaged: 2025-01-27 21:14:12 UTC; dvbn
+Config/testthat/edition: 3
+Encoding: UTF-8
+NeedsCompilation: yes
 Author: David Benatia [cre, aut],
   Christophe Bellégo [aut],
   Joel Cuerrier [aut],
   Vincent Dortet-Bernadet [aut]
+Packaged: 2026-11-06 19:00:28 UTC; runner
 Repository: CRAN
-Date/Publication: 2025-01-27 21:40:02 UTC
+Date/Publication: 2026-11-07 17:00:30 UTC

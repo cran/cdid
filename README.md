@@ -1,233 +1,162 @@
-# cdid: The Chained Difference-in-Differences
+# cdid for R <img src="man/figures/logo.png" align="right" width="120" alt="cdid logo" />
 
-The `cdid` package extends the popular `did` library by Brantly Callaway to improve efficiency and handle unbalanced panel data in staggered treatment designs. It implements the methodology introduced in:
+`cdid` estimates group time average treatment effects ATT(g,t) with chained difference in differences (chained DiD). It builds upon the [`did` package](https://bcallaway11.github.io/did/) and extends it to panels in which some outcomes may be missing, by using the outcome changes between the dates at which each unit is observed.
 
-**Bellego, Benatia, and Dortet-Bernadet (2024), "The Chained Difference-in-Differences", Journal of Econometrics.** <https://doi.org/10.1016/j.jeconom.2024.105783>
+[CRAN package page](https://cran.r-project.org/package=cdid) · [Author website](https://www.davidbenatia.com/research/)
 
-## Features
-
--   **Enhanced Efficiency**: Offers greater precision for balanced panels (smaller standard errors)
--   **Handles Missing Data**: Offers greater precision for unbalanced panels, especially when errors are serially correlated.
--   **Reduced Bias**: Less prone to bias when missingness is tied to unobservable heterogeneity.
--   **Flexible Control Groups**: Supports control groups comprising either "nevertreated" or "notyettreated" units, like in the did library.
--   **Customizable Weighting**: Implements aggregation with two weighting matrix options:
-    -   **Identity**: Best for smaller datasets with less overidentifying restrictions (many missings like in rotating panel surveys)
-    -   **Two-step**: Best for larger datasets with many overidentifying restrictions (few missings).
-
-Future developments: generalized attrition model (MAR & sequential MAR), doubly-robust estimator (so far only ipw is implemented), and improved computational efficiency. Hopefully, it will be directly integrated within the did library.
+The current CRAN release is 0.1.1. This repository contains version 1.2.0.1,
+which is being prepared for the next CRAN update.
 
 ## Installation
 
-The `cdid` package can be installed from CRAN using:
+Install directly from GitHub in a normal R session:
 
-``` r
-install.packages("cdid")
-```
-
-Alternatively, for the development version:
-
-``` r
-remotes::install_github("joelcuerrier/cdid", ref = "main", build_vignettes = TRUE, force = TRUE)
-```
-
-## Getting Started
-
-### Example Usage with Simulated Data
-
-``` r
-library(did) #for comparison
+```r
+# Run once if remotes is not installed:
+install.packages("remotes")
+remotes::install_github("dvbn/cdid")
 library(cdid)
-
-set.seed(123)
-
-# Generate a balanced dataset with unit fixed-effects
-# The true values of the coefficients are based on time-to-treatment. The treatment
-# effect is zero before the treatment, 1.75 one period after, 1.5 two period after,
-# 1.25 three period after, 1 four period after, 0.75 five period after, 0.5 six  
-# period after, etc.
-
-data0 <- fonction_simu_attrition(
-  N = 500, T = 8,
-  theta2_alpha_Gg = 0.5, lambda1_alpha_St = 0,
-  sigma_alpha = 2, sigma_epsilon = 0.1, tprob = 0.5
-)
-
-# Ensure all observations are included for a balanced panel
-data0$S <- 1
-
-# Run the original `did` library estimation
-did.results = did:: att_gt(
-  yname="Y",
-  tname="date",
-  idname = "id",
-  gname = "date_G",
-  xformla = ~X,
-  data = data0,
-  weightsname = NULL,
-  allow_unbalanced_panel = FALSE,
-  panel = TRUE,
-  control_group = "notyettreated",
-  alp = 0.05,
-  bstrap = TRUE,
-  cband = TRUE,
-  biters = 1000,
-  clustervars = NULL,
-  est_method = "ipw",
-  base_period = "varying",
-  print_details = FALSE,
-  pl = FALSE,
-  cores = 1
-)
-
-# Run `cdid` with 2-step weighting matrix
-result_2step = att_gt_cdid(yname="Y", tname="date",
-                         idname="id",
-                         gname="date_G",
-                         xformla=~X,
-                         data=data0,
-                         control_group="notyettreated",
-                         alp=0.05,
-                         bstrap=TRUE,
-                         biters=1000,
-                         clustervars=NULL,
-                         cband=TRUE,
-                         est_method="2-step",
-                         base_period="varying",
-                         print_details=FALSE,
-                         pl=FALSE,
-                         cores=1)
-
-# Run `cdid` with identity weighting matrix
-result_id = att_gt_cdid(yname="Y", tname="date",
-                        idname="id",
-                        gname="date_G",
-                        xformla=~X,
-                        data=data0,
-                        control_group="notyettreated",
-                        alp=0.05,
-                        bstrap=TRUE,
-                        biters=1000,
-                        clustervars=NULL,
-                        cband=TRUE,
-                        est_method="Identity",
-                        base_period="varying",
-                        print_details=FALSE,
-                        pl=FALSE,
-                        cores=1)
-
-# Print results
-print(did.results)
-print(result_2step)
-print(result_id)
 ```
 
-### Aggregating Results
+You need **R 4.1.0 or later** and the official CRAN packages **did 2.5.1 or
+later** and **DRDID 1.4.0 or later**. `remotes` installs missing required
+dependencies and offers updates when needed. Allow updates to dependencies
+below these minimum versions. You do not need GitHub versions of `did` or
+`DRDID`.
 
-After computing the group-time ATT estimates, aggregate results can be obtained using functions from did library
+Installing from GitHub compiles `cdid`'s C code, so the usual tools for building
+R packages from source must be available:
 
-``` r
-agg.es.did <- aggte(MP = did.results, type = 'dynamic')
-agg.es.2step <- aggte(MP = result_2step, type = 'dynamic')
-agg.es.id <- aggte(MP = result_id, type = 'dynamic')
+- **Windows:** [Rtools](https://cran.r-project.org/bin/windows/Rtools/)
+  matching your R version.
+- **macOS:** Xcode Command Line Tools; see the
+  [R for macOS tools](https://mac.r-project.org/tools/).
+- **Linux:** a C/C++ compiler and `make`, including tools needed by dependencies.
 
-# Print aggregate results
-print(agg.es.did)
-print(agg.es.2step)
-print(agg.es.id)
-```
+No Docker, Homebrew installation of R, special project library or validation
+scripts are required. A standard CRAN installation of R is suitable.
 
-### Working with Unbalanced Panels
+`cdid` 1.2.0.1 has been tested with `did` 2.5.1 and `DRDID` 1.4.0 under
+R 4.5.2. R 4.5.2 is a tested version, not an installation requirement. Later
+versions of these dependencies are accepted but have not been comprehensively
+tested; compatibility and identical results are not guaranteed. The optional
+[pinned validation setup](https://github.com/dvbn/cdid/blob/main/validation/SETUP.md#optional-pinned-validation-setup)
+reproduces the tested dependency versions for checks of this revision; historical
+outputs retain their recorded dependency versions.
 
-The `cdid` library excels with unbalanced panels. Here's an example:
+If an error reports outdated `did` or `DRDID`, update them with
+`install.packages(c("did", "DRDID"))` and restart R before trying again.
+Modified forks of these packages may have different interfaces even when their
+version numbers exceed the minimum. An abrupt **"R session aborted"** can also
+come from incompatible local R installations and compiled packages. In that
+case, check [which R version RStudio uses](https://support.posit.co/hc/en-us/articles/200486138-Changing-R-versions-for-the-RStudio-Desktop-IDE)
+and reinstall affected dependencies with that R installation. For help, include
+`sessionInfo()` and installation output in an
+[issue](https://github.com/dvbn/cdid/issues).
 
-``` r
-# Generate a dataset with missing observations based on sampling indicator S
-data0 <- fonction_simu_attrition(
-  N = 500, T = 8,
-  theta2_alpha_Gg = 0.5, lambda1_alpha_St = 0,
-  sigma_alpha = 2, sigma_epsilon = 0.1, tprob = 0.5
-)
+A short hands-on vignette covers an incomplete panel, estimation, diagnostics,
+aggregation and plotting. To include it when installing from GitHub, use
+`remotes::install_github("dvbn/cdid", build_vignettes = TRUE)` with `knitr`,
+`rmarkdown` and Pandoc available. Open it with
+`vignette("cdid", package = "cdid")`. The [full user guide](https://github.com/dvbn/cdid/blob/main/docs/README.md)
+and [practical notebook](https://github.com/dvbn/cdid/blob/main/notebooks/cdid_practical_guide.qmd) provide more examples.
 
-# Keep only non-missing (S==1)
-data0 <- data0[data0$S == 1, ]
+## What the package does
 
-# Run estimations as before, but specify panel = FALSE for did::att_gt()
-did.results = did:: att_gt(
-  yname="Y",
-  tname="date",
-  idname = "id",
-  gname = "date_G",
-  xformla = ~X,
-  data = data0,
-  weightsname = NULL,
-  allow_unbalanced_panel = FALSE,
-  panel = FALSE,
-  control_group = "notyettreated",
-  alp = 0.05,
-  bstrap = TRUE,
-  cband = TRUE,
-  biters = 1000,
-  clustervars = NULL,
-  est_method = "ipw",
-  base_period = "varying",
-  print_details = FALSE,
-  pl = FALSE,
-  cores = 1
-)
+A treatment cohort is the set of units first treated in the same period. For cohort g and period t, ATT(g,t) is the average effect of the treatment in period t on the units of cohort g. [Callaway and Sant'Anna (2021, *Journal of Econometrics*)](https://doi.org/10.1016/j.jeconom.2020.12.001) define these effects for staggered adoption, estimate each one by comparing the cohort with units never treated or not yet treated, and aggregate them into summaries such as event studies. The `did` package implements their estimators, which adjust for covariates by outcome regression (OR), inverse probability weighting (IPW) or a doubly robust (DR) combination of the two.
 
-#For cdid, there is no difference
-result_2step = att_gt_cdid(yname="Y", tname="date",
-                         idname="id",
-                         gname="date_G",
-                         xformla=~X,
-                         data=data0,
-                         control_group="notyettreated",
-                         alp=0.05,
-                         bstrap=TRUE,
-                         biters=1000,
-                         clustervars=NULL,
-                         cband=TRUE,
-                         est_method="2-step",
-                         base_period="varying",
-                         print_details=FALSE,
-                         pl=FALSE,
-                         cores=1)
+`cdid` extends this framework to incomplete panels with the chained DiD of ([Bellégo, Benatia and Dortet-Bernadet (2025, *Journal of Econometrics*)](https://doi.org/10.1016/j.jeconom.2024.105783), [arXiv](https://arxiv.org/abs/2301.01085)). `did` handles an unbalanced panel either by keeping only the units observed at every date or, with `allow_unbalanced_panel = TRUE`, through repeated cross section (RCS) estimators that compare outcome levels. Chained DiD instead uses the changes of each unit between the dates at which it is observed, and combines all available short DiD comparisons into the effects. The targets remain the ATT(g,t) of the cohorts of the original study population, including their units with missing outcomes, and the assumptions concern the missing changes rather than the missing levels, as explained below.
 
-result_id = att_gt_cdid(yname="Y", tname="date",
-                        idname="id",
-                        gname="date_G",
-                        xformla=~X,
-                        data=data0,
-                        control_group="notyettreated",
-                        alp=0.05,
-                        bstrap=TRUE,
-                        biters=1000,
-                        clustervars=NULL,
-                        cband=TRUE,
-                        est_method="Identity",
-                        base_period="varying",
-                        print_details=FALSE,
-                        pl=FALSE,
-                        cores=1)
-```
+Two adjustments are chosen separately. The treatment adjustment, chosen with `est_method`, makes each cohort comparable with its controls by IPW, OR or DR, as in `did` ([Treatment adjustment](https://github.com/dvbn/cdid/blob/main/docs/methods/treatment.md)). The adjustment for missing outcomes applies when attrition or other missingness depends on measured covariates related to the changes. With `selection = "conditional_mtar"`, `selection_est_method` chooses observation weighting, which weights each observed change by the inverse of its estimated probability of being observed at both dates (`"ipw"`), change imputation, which predicts the changes with a regression fitted to the observed changes (`"imputation"`), or the augmented correction, which combines the two (`"dr"`) and works with treatment IPW, OR or DR ([Handling missing outcomes](https://github.com/dvbn/cdid/blob/main/docs/methods/missing-outcomes.md#how-to-adjust)). Treatment DR with the augmented correction is doubly robust in both layers: for the treatment, either the propensity model or the outcome regression may be misspecified, and for the missing outcomes, either the observation model or the imputation model, provided the other model of the layer and the remaining assumptions are correct ([Which models must be correct](https://github.com/dvbn/cdid/blob/main/docs/methods/missing-outcomes.md#which-models-must-be-correct)).
 
-## Documentation
+For treatment OR and DR, `outcome_pooling = "separate"` is the default: each distinct comparison has its own outcome coefficients. Explicit `"pooled"` shares slopes per calendar step across comparisons, with local intercepts, preserving the earlier specification. This choice is independent of the observation and imputation pooling settings ([Treatment adjustment](https://github.com/dvbn/cdid/blob/main/docs/methods/treatment.md#outcome-regression-or)).
 
-Complete documentation and detailed examples are available through the package's help pages:
+`cdid` also lets you choose between two parallel trends assumptions. PT-post, the default, assumes parallel trends from each cohort's reference period onward. PT-all, which `did` 2.5.1 (the tested version) does not offer, adds the same assumption from a chosen common start date up to each reference period, so that each of those earlier dates can also serve as a baseline. As in Bellégo, Benatia and Dortet-Bernadet (2025), short comparisons between observed dates are combined by the generalized method of moments (GMM), and the system is overidentified when several comparisons inform the same effect. Under PT-post this system already combines the comparisons that PT-post makes valid; PT-all adds to the same system the earlier restrictions that only its stronger assumption justifies. Valid restrictions can make more effects available or improve precision, but neither gain is guaranteed, and false restrictions can bias the estimates ([Parallel trends](https://github.com/dvbn/cdid/blob/main/docs/methods/parallel-trends.md#pt-all)). How cells before treatment are reported is a separate choice, `base_period`, which changes neither assumption. A future release will incorporate additional efficiency options.
 
-``` r
-?cdid
-browseVignettes("cdid")
-```
+`cdid` imports `did` and keeps familiar function names and upstream argument order: `att_gt()`, `aggte()`, `ggdid()`, `tidy()`, `glance()` and `conditional_did_pretest()`. Most upstream defaults are retained, including treatment DR for `att_gt()`. Panel data select chained mode by default, and `allow_unbalanced_panel = NULL` resolves according to the mode. The [migration page](https://github.com/dvbn/cdid/blob/main/docs/from-did.md) explains these differences and the added chained arguments.
 
-and a dedicated webpage: <https://www.davidbenatia.com/projects/cdid-library/>.
+- **Chained mode** is the default for panel data. It estimates the usable short comparisons between pairs of dates at which units are observed and combines them by GMM into the effects. A unit contributes the changes between its observed dates, so the panel does not need to be complete. An effect that these comparisons cannot recover, given cohort and control support and the assumptions, is reported as [unavailable with a reason](https://github.com/dvbn/cdid/blob/main/docs/help/troubleshooting.md#an-effect-is-unavailable).
+- **Ordinary mode**, requested with `mode = "ordinary"` and used automatically for repeated cross sections, passes the call unchanged to `did`.
+
+Let us illustrate how Chained DiD works with changes within the same unit. Write the outcome of unit i at date t as $Y_{it} = \alpha_i + u_{it}$, where $\alpha_i$ is a fixed individual effect and $u_{it}$ holds everything that varies over time: trends, the treatment effect and noise. The change between two observed dates, $Y_{it} - Y_{is} = u_{it} - u_{is}$, contains no $\alpha_i$. Suppose that treated units with low $\alpha_i$, that is with persistently low outcomes, are more likely to leave the panel, while controls leave at random. The treated units still observed at later dates then have a higher mean $\alpha_i$, so comparing their outcome levels with earlier ones adds this change in composition to the treatment effect. Thus, if attrition depends only on $\alpha_i$ and $\alpha_i$ is unrelated to $u_{it} - u_{is}$, the treated units that remain still have the mean change of their cohort.
+
+This is the main advantage of chained DiD for incomplete panels: whether an outcome is observed may depend on the unobservable individual effect, as long as that effect is unrelated to the changes, and the observed levels need not remain representative of the population. For RCS comparisons, changing composition must not distort the relevant conditional level comparisons. Representative samples at each date are one sufficient condition. Assuming missing completely at random (MCAR) guarantees this, but is stronger than necessary. Attrition related to persistent differences between units can violate that condition.
+
+Chained DiD has its own assumptions. Within a cohort, the units observed in a given pair must be representative of that cohort with respect to the mean outcome change over that pair, possibly conditional on covariates with an appropriate adjustment. This equates population expectations of changes. It does not require every unit to have the same change, exact equality of realized sample means, or equality of the full distributions. Parallel trends, no anticipation and overlap must also hold. [Handling missing outcomes](https://github.com/dvbn/cdid/blob/main/docs/methods/missing-outcomes.md#the-assumption-about-missing-outcomes), [Parallel trends](https://github.com/dvbn/cdid/blob/main/docs/methods/parallel-trends.md) and [Treatment adjustment](https://github.com/dvbn/cdid/blob/main/docs/methods/treatment.md) state these assumptions. Neither approach is always better in every design: when the sample at each date represents the population, comparisons of levels can be valid too. [Identify effects when the observed units change composition](https://github.com/dvbn/cdid/blob/main/docs/examples/identification.md) works through a design in which the changes identify the effects and comparisons of levels do not.
+
+In practice, unless you can rule out that attrition or other missingness is related to persistent unobserved differences between units, chained DiD is the safer choice, provided its assumptions about changes hold. When observation plausibly depends on such stable differences in outcomes, comparisons of observed levels mix the change in composition with the effects, whereas the changes do not contain the persistent component. Removing the fixed effect does not by itself make the missing changes ignorable, however: if the persistent component is related to trends or to heterogeneous treatment effects, observation that depends on it also selects the changes, and the assumption about changes can fail.
+
+Chained DiD can also be more precise than RCS comparisons when both are valid. Differencing removes the persistent unit component $\alpha_i$, whose variation otherwise adds noise to comparisons of levels, while the transitory noise of each short change accumulates along a chain. Bellégo, Benatia and Dortet-Bernadet (2025, Section 2.1.3 and Proposition 1) analyze this trade-off under their outcome model with outcomes missing completely at random: the gain in precision depends on how persistent the outcomes are, how much units differ and how far apart the compared dates are, so neither approach is more precise in every design. [How to compare precision](https://github.com/dvbn/cdid/blob/main/docs/examples/precision.md) explains how to compare them on matched targets.
 
 ## References
 
-Bellego, C., Benatia, D., and Dortet-Bernadet, V. (2024). *The Chained Difference-in-Differences*. Journal of Econometrics. <https://doi.org/10.1016/j.jeconom.2024.105783>
+- Bellégo, C., Benatia, D. and Dortet-Bernadet, V. (2025). The Chained Difference-in-Differences. *Journal of Econometrics*, 248, article 105783. <https://doi.org/10.1016/j.jeconom.2024.105783>. arXiv version: <https://arxiv.org/abs/2301.01085>
 
-Callaway, B., & Sant'Anna, P. H. C. (2021). *Difference-in-Differences with Multiple Time Periods*. Journal of Econometrics. <https://doi.org/10.1016/j.jeconom.2020.12.001>
+- Callaway, B. and Sant'Anna, P. H. C. (2021). Difference-in-Differences with Multiple Time Periods. *Journal of Econometrics*, 225(2), pages 200 to 230. <https://doi.org/10.1016/j.jeconom.2020.12.001>
 
-## License
+Chained IPW (`est_method = "ipw"`) and observation weighting for missing outcomes follow Bellégo, Benatia and Dortet-Bernadet. The package extends these papers with chained OR and DR, which carry the OR and DR approaches over to chained comparisons through regressions of the controls' outcome changes, fitted separately by comparison by default or pooled with `outcome_pooling = "pooled"`, and with change imputation and PT-all. The [augmented correction](https://github.com/dvbn/cdid/blob/main/docs/methods/missing-outcomes.md#augmented-correction) for missing outcomes, which combines an observation model with a change imputation model and can be used with treatment IPW, OR or DR, is a further extension; an accompanying paper is about to be released. The methods pages in the reading path state the assumptions each extension needs.
 
-This package is licensed under the GPL-2 license.
+## Reading path
+
+Each page of the guide ends with links to the previous and next steps and a collapsible list of all steps.
+
+For the input requirements and a practical check of your observation patterns, start with [Prepare your panel and unit table](https://github.com/dvbn/cdid/blob/main/docs/help/prepare-data.md) and [Investigate missingness and data structure](https://github.com/dvbn/cdid/blob/main/docs/help/investigate-missingness.md). The latter shows counts across study units, selected-pair support and the diagnostics available from a fitted result. Observed missingness patterns alone cannot establish the required representativeness of mean changes.
+
+For hands-on exploration, use the [editable Quarto source](https://github.com/dvbn/cdid/blob/main/notebooks/cdid_practical_guide.qmd) or [download the standalone HTML with results](https://github.com/dvbn/cdid/raw/refs/heads/main/notebooks/cdid_practical_guide.html). Download the HTML file and open it in a browser to read the tables and plots without running R. One editable configuration controls the synthetic panel, and the sections walk through estimation, missingness, selection models, aggregation, inference and diagnostics. The [notebook instructions](https://github.com/dvbn/cdid/blob/main/notebooks/README.md) explain how to run the code or open its rendered HTML with tables and plots.
+
+| Step | Page | Description |
+| --- | --- | --- |
+| 1 | [Get started](https://github.com/dvbn/cdid/blob/main/docs/get-started.md) | Main functions on a balanced panel: estimation, summaries, aggregation, plots and export. |
+| 2 | [Moving from did](https://github.com/dvbn/cdid/blob/main/docs/from-did.md) | What stays familiar, how incomplete panels are treated, and [why balanced results can differ and which to use](https://github.com/dvbn/cdid/blob/main/docs/from-did.md#why-can-balanced-results-differ-and-which-should-i-use). |
+| 3 | [Incomplete panels](https://github.com/dvbn/cdid/blob/main/docs/examples/incomplete-panels.md) | Which changes an observation pattern supplies and how chaining combines them, with a rotating panel example. |
+| 4 | [Identify effects when the observed units change composition](https://github.com/dvbn/cdid/blob/main/docs/examples/identification.md) | When changes within units identify effects that comparisons of observed levels do not. |
+| 5 | [How to compare precision](https://github.com/dvbn/cdid/blob/main/docs/examples/precision.md) | Matched targets and assumptions, covariance, and what standard errors can show. |
+| 6 | [Prepare your panel and unit table](https://github.com/dvbn/cdid/blob/main/docs/help/prepare-data.md) | Identifiers, missing outcomes kept as `NA`, the unit table, and changing covariates or weights. |
+| 7 | [Treatment adjustment](https://github.com/dvbn/cdid/blob/main/docs/methods/treatment.md) | How IPW, OR and DR make a cohort comparable with its controls. |
+| 8 | [Choose IPW, OR or DR in an incomplete panel](https://github.com/dvbn/cdid/blob/main/docs/examples/treatment-choice.md) | The three treatment adjustments compared on one incomplete panel. |
+| 9 | [Handling missing outcomes](https://github.com/dvbn/cdid/blob/main/docs/methods/missing-outcomes.md) | The study population, the assumption about missing outcomes and the three ways to adjust for them. |
+| 10 | [Sampling information for the observation model](https://github.com/dvbn/cdid/blob/main/docs/methods/sampling-information.md) | Advanced: fitting the observation model on part of the unit table. |
+| 11 | [Choose an observation model](https://github.com/dvbn/cdid/blob/main/docs/examples/observation-models.md) | Date or pair logits, and how many slopes they share. |
+| 12 | [Impute actual changes](https://github.com/dvbn/cdid/blob/main/docs/examples/change-imputation.md) | Observation weighting, change imputation and the augmented correction compared on one panel. |
+| 13 | [Parallel trends](https://github.com/dvbn/cdid/blob/main/docs/methods/parallel-trends.md) | PT-post, PT-all and the separate reporting choice `base_period`. |
+| 14 | [Add PT-all restrictions](https://github.com/dvbn/cdid/blob/main/docs/examples/pt-all-comparison.md) | What true and false PT-all restrictions change on one incomplete panel. |
+| 15 | [GMM weighting and covariance regularization](https://github.com/dvbn/cdid/blob/main/docs/methods/gmm.md) | How comparisons are combined and what covariance regularization does. |
+| 16 | [Robustness](https://github.com/dvbn/cdid/blob/main/docs/examples/robustness.md) | Which models must be correct for each combination of treatment adjustment and missing outcome handling. |
+| 17 | [Inference](https://github.com/dvbn/cdid/blob/main/docs/examples/inference.md) | Intervals, bands, clustering, aggregation and pretrend tests. |
+| 18 | [Options](https://github.com/dvbn/cdid/blob/main/docs/reference/options.md) | Every argument with its default, accepted values and when it is active. |
+| 19 | [Results](https://github.com/dvbn/cdid/blob/main/docs/reference/results.md) | The contents of each result, the uncertainty rules, pretrend tests and export. |
+| 20 | [Diagnose errors and unavailable results](https://github.com/dvbn/cdid/blob/main/docs/help/troubleshooting.md) | Refused requests, failed fits, unavailable effects and surprising results. |
+
+This guide describes version 1.2.0.1. Numerical code output shown on the article pages comes from recorded runs, and each page states the version actually used. Analytical population values are labeled separately.
+
+## Terms used in this guide
+
+| Term | Meaning |
+| --- | --- |
+| Study population | The population whose treatment effects the analysis describes. |
+| Unit table | One row per study unit, supplied through the `frame` argument, including units with one or no observed outcomes. Without `frame`, the units present in `data` form it. |
+| Treatment cohort | Units first treated in the same period. `gname` holds that period, and 0 marks units never treated. |
+| Units observed at both dates | The units whose outcomes are observed at both dates of a comparison. Only they contribute that change. |
+| Treatment adjustment | How each cohort is made comparable with its controls: IPW, OR or DR, chosen with `est_method`. |
+| Handling missing outcomes | The assumption made about missing outcomes and the way the package adjusts for them, chosen with the arguments that begin with `selection` and with `imputation_pooling`. |
+| PT-post and PT-all | Parallel trends from each cohort's reference period onward, and the same assumption with additional restrictions from a common start date. |
+
+## Roadmap
+
+More efficient estimators will be implemented in later releases.
+
+Python and Stata versions are planned. They will have separate repositories and documentation.
+
+## Questions and bug reports
+
+Use [Issues](https://github.com/dvbn/cdid/issues) for questions about using the package or choosing a method and for reproducible bugs. Include the package version and reproducible example.
+
+See [Contributing](https://github.com/dvbn/cdid/blob/main/CONTRIBUTING.md) to suggest a change.
+
+## Contributing
+
+Have spare Codex subscription capacity and want to support cdid? Use your own account to complete a [scoped contributor task](https://github.com/dvbn/cdid/blob/main/contributing/TASKS.md), then return your code, checks or findings for review. We provide [public instructions](https://github.com/dvbn/cdid/blob/main/AGENTS.md) and a [reusable skill](https://github.com/dvbn/cdid/blob/main/.agents/skills/cdid-contribution/SKILL.md). You choose your time and usage budget and keep your credentials private. Contributions without coding agents are equally welcome. See [Contributing](https://github.com/dvbn/cdid/blob/main/CONTRIBUTING.md) to get started.
+
+## Support the project
+
+If cdid is useful to your work, you can [buy me a coffee](https://buymeacoffee.com/dvbn).
